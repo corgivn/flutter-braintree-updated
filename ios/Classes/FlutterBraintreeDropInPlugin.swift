@@ -111,22 +111,22 @@ public class FlutterBraintreeDropInPlugin: BaseFlutterBraintreePlugin, FlutterPl
                 dropInRequest.paypalDisabled = !paypalEnabled
             }
 
-            if let paypalInfo = dict(for: "paypalRequest", in: call) {
-                if let amount = paypalInfo["amount"] as? String {
-                    let paypalRequest = BTPayPalCheckoutRequest(amount: amount)
-                    paypalRequest.currencyCode = paypalInfo["currencyCode"] as? String
-                    paypalRequest.displayName = paypalInfo["displayName"] as? String
-                    paypalRequest.billingAgreementDescription = paypalInfo["billingAgreementDescription"] as? String
-                    dropInRequest.payPalRequest = paypalRequest
-                } else {
-                    let paypalRequest = BTPayPalVaultRequest()
-                    paypalRequest.displayName = paypalInfo["displayName"] as? String
-                    paypalRequest.billingAgreementDescription = paypalInfo["billingAgreementDescription"] as? String
-                    dropInRequest.payPalRequest = paypalRequest
-                }
-            } else {
-                dropInRequest.paypalDisabled = true
-            }
+            // if let paypalInfo = dict(for: "paypalRequest", in: call) {
+            //     // if let amount = paypalInfo["amount"] as? String {
+            //     //     let paypalRequest = BTPayPalCheckoutRequest(amount: amount)
+            //     //     paypalRequest.currencyCode = paypalInfo["currencyCode"] as? String
+            //     //     paypalRequest.displayName = paypalInfo["displayName"] as? String
+            //     //     paypalRequest.billingAgreementDescription = paypalInfo["billingAgreementDescription"] as? String
+            //     //     dropInRequest.payPalRequest = paypalRequest
+            //     // } else {
+            //         let paypalRequest = BTPayPalVaultRequest()
+            //         paypalRequest.displayName = paypalInfo["displayName"] as? String
+            //         paypalRequest.billingAgreementDescription = paypalInfo["billingAgreementDescription"] as? String
+            //         dropInRequest.payPalRequest = paypalRequest
+            //     // }
+            // } else {
+            //     dropInRequest.paypalDisabled = true
+            // }
             
             if let applePayInfo = dict(for: "applePayRequest", in: call) {
                 self.applePayInfo = applePayInfo

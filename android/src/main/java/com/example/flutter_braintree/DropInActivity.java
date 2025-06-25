@@ -10,7 +10,10 @@ import com.braintreepayments.api.DropInClient;
 import com.braintreepayments.api.DropInListener;
 import com.braintreepayments.api.DropInRequest;
 import com.braintreepayments.api.DropInResult;
+import com.braintreepayments.api.GooglePayRequest;
 import com.braintreepayments.api.UserCanceledException;
+import com.google.android.gms.wallet.TransactionInfo;
+import com.google.android.gms.wallet.WalletConstants;
 
 public class DropInActivity extends AppCompatActivity implements DropInListener {
     private DropInClient dropInClient;

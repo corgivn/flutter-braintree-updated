@@ -115,7 +115,7 @@ public class FlutterBraintreeDropIn implements FlutterPlugin, ActivityAware, Met
       dropInRequest.setMaskCardNumber((Boolean) call.argument("maskCardNumber"));
 
       readGooglePaymentParameters(dropInRequest, call);
-      readPayPalParameters(dropInRequest, call);
+      // readPayPalParameters(dropInRequest, call);
       if (!((Boolean) call.argument("venmoEnabled")))
         dropInRequest.setVenmoDisabled(true);
       if (!((Boolean) call.argument("cardEnabled")))
@@ -146,10 +146,10 @@ public class FlutterBraintreeDropIn implements FlutterPlugin, ActivityAware, Met
     GooglePayRequest googlePayRequest = new GooglePayRequest();
     googlePayRequest.setTransactionInfo(TransactionInfo.newBuilder()
             .setTotalPrice((String) arg.get("totalPrice"))
-            .setTotalPriceStatus(WalletConstants.TOTAL_PRICE_STATUS_FINAL)
             .setCurrencyCode((String) arg.get("currencyCode"))
+            .setTotalPriceStatus(WalletConstants.TOTAL_PRICE_STATUS_FINAL)
             .build());
-    googlePayRequest.setBillingAddressRequired(true);
+    googlePayRequest.setEmailRequired(true);
     dropInRequest.setGooglePayRequest(googlePayRequest);
   }
 
