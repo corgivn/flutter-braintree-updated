@@ -227,4 +227,22 @@ var request = BraintreeDropInRequest(
 );
 ```
 
+### Language / Localization
+
+You can configure the language used by the native Drop-in flows from Flutter:
+
+```dart
+// iOS: updates AppleLanguages in UserDefaults
+// Android: updates the current Locale/Configuration
+await BraintreeDropIn.setLanguage('vi');      // Vietnamese
+await BraintreeDropIn.setLanguage('en');      // English
+await BraintreeDropIn.setLanguage('zh-Hant'); // Traditional Chinese
+await BraintreeDropIn.setLanguage('zh-Hans'); // Simplified Chinese
+```
+
+- On iOS, this writes to the `AppleLanguages` UserDefaults key and may require restarting the app
+  for all UI to fully update.
+- On Android, this updates the current `Locale`/`Configuration` used when launching the Drop-in
+  activity. Existing screens may need to be recreated to fully apply the new language.
+
 See `BraintreeDropInRequest` and `BraintreeDropInResult` for more documentation.

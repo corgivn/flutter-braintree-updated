@@ -80,7 +80,13 @@ class _MyAppState extends State<MyApp> {
                       countryCode: 'US',
                       merchantIdentifier: '',
                       displayName: '',
-                      paymentSummaryItems: []),
+                      paymentSummaryItems: [
+                        ApplePaySummaryItem(
+                          label: 'MB',
+                          amount: 10.toDouble(),
+                          type: ApplePaySummaryItemType.final_,
+                        ),
+                      ]),
                   paypalRequest: BraintreePayPalRequest(
                     amount: '4.20',
                     displayName: 'Example company',
@@ -142,6 +148,31 @@ class _MyAppState extends State<MyApp> {
                 }
               },
               child: Text('PAYPAL CHECKOUT FLOW'),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () async {
+                await BraintreeDropIn.setLanguage('vi');
+              },
+              child: const Text('SET LANGUAGE: VI'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await BraintreeDropIn.setLanguage('zh-Hant');
+              },
+              child: const Text('SET LANGUAGE: ZH-TC'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await BraintreeDropIn.setLanguage('zh-Hans');
+              },
+              child: const Text('SET LANGUAGE: ZH-SC'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await BraintreeDropIn.setLanguage('en');
+              },
+              child: const Text('SET LANGUAGE: EN'),
             ),
           ],
         ),

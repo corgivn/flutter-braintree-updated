@@ -99,132 +99,153 @@ public class FlutterBraintreeDropInPlugin: BaseFlutterBraintreePlugin, FlutterPl
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         completionBlock = result
-        guard call.method == "start" else {
-            return
-        }
-
-        guard !isHandlingResult else {
-            returnAlreadyOpenError(result: result)
-            return
-        }
-
-        isHandlingResult = true
-
-        guard let (newWindow, blockerVC) = makeOverlayWindow(flutterResult: result) else {
-            return
-        }
-
-        let threeDSecureRequest = BTThreeDSecureRequest()
-
-        if let email = string(for: "email", in: call) {
-            threeDSecureRequest.email = email
-        }
-        threeDSecureRequest.versionRequested = .version2
-
-        if let billingAddress = dict(for: "billingAddress", in: call) {
-            let address = BTThreeDSecurePostalAddress()
-            address.givenName = billingAddress["givenName"] as? String
-            address.surname = billingAddress["surname"] as? String
-            address.phoneNumber = billingAddress["phoneNumber"] as? String
-            address.streetAddress = billingAddress["streetAddress"] as? String
-            address.extendedAddress = billingAddress["extendedAddress"] as? String
-            address.locality = billingAddress["locality"] as? String
-            address.region = billingAddress["region"] as? String
-            address.postalCode = billingAddress["postalCode"] as? String
-            address.countryCodeAlpha2 = billingAddress["countryCodeAlpha2"] as? String
-            threeDSecureRequest.billingAddress = address
-
-            // Optional additional information.
-            // For best results, provide as many of these elements as possible.
-            let info = BTThreeDSecureAdditionalInformation()
-            info.shippingAddress = address
-            threeDSecureRequest.additionalInformation = info
-        }
-
-        let dropInRequest = BTDropInRequest()
-
-        if let amount = string(for: "amount", in: call) {
-            threeDSecureRequest.threeDSecureRequestDelegate = self
-            threeDSecureRequest.amount = NSDecimalNumber(string: amount)
-            dropInRequest.threeDSecureRequest = threeDSecureRequest
-        }
-
-        var deviceData: String?
-        if let collectDeviceData = bool(for: "collectDeviceData", in: call), collectDeviceData {
-            deviceData = PPDataCollector.collectPayPalDeviceData()
-        }
-
-        if let vaultManagerEnabled = bool(for: "vaultManagerEnabled", in: call) {
-            dropInRequest.vaultManager = vaultManagerEnabled
-        }
-
-        if let cardEnabled = bool(for: "cardEnabled", in: call) {
-            dropInRequest.cardDisabled = !cardEnabled
-        }
-
-        if let paypalEnabled = bool(for: "paypalEnabled", in: call) {
-            dropInRequest.paypalDisabled = !paypalEnabled
-        }
-
-        // if let paypalInfo = dict(for: "paypalRequest", in: call) {
-        //     // if let amount = paypalInfo["amount"] as? String {
-        //     //     let paypalRequest = BTPayPalCheckoutRequest(amount: amount)
-        //     //     paypalRequest.currencyCode = paypalInfo["currencyCode"] as? String
-        //     //     paypalRequest.displayName = paypalInfo["displayName"] as? String
-        //     //     paypalRequest.billingAgreementDescription = paypalInfo["billingAgreementDescription"] as? String
-        //     //     dropInRequest.payPalRequest = paypalRequest
-        //     // } else {
-        //         let paypalRequest = BTPayPalVaultRequest()
-        //         paypalRequest.displayName = paypalInfo["displayName"] as? String
-        //         paypalRequest.billingAgreementDescription = paypalInfo["billingAgreementDescription"] as? String
-        //         dropInRequest.payPalRequest = paypalRequest
-        //     // }
-        // } else {
-        //     dropInRequest.paypalDisabled = true
-        // }
-
-        if let applePayInfo = dict(for: "applePayRequest", in: call) {
-            self.applePayInfo = applePayInfo
-        } else {
-            dropInRequest.applePayDisabled = true
-        }
-
-        guard let authorization = getAuthorization(call: call) else {
-            returnAuthorizationMissingError(result: result)
-            isHandlingResult = false
-            return
-        }
-
-        self.authorization = authorization
-
-        let dropInController = BTDropInController(
-            authorization: authorization, request: dropInRequest
-        ) { (controller, braintreeResult, error) in
-            controller.dismiss(animated: true) {
-                self.clearOverlayWindowIfNeeded(for: braintreeResult)
+        switch call.method {
+        case "start":
+            guard !isHandlingResult else {
+                returnAlreadyOpenError(result: result)
+                return
             }
-            self.handleResult(
-                result: braintreeResult, error: error, flutterResult: result,
-                deviceData: deviceData)
-            self.isHandlingResult = false
+
+            isHandlingResult = true
+
+            guard let (newWindow, blockerVC) = makeOverlayWindow(flutterResult: result) else {
+                return
+            }
+
+            let threeDSecureRequest = BTThreeDSecureRequest()
+
+            if let email = string(for: "email", in: call) {
+                threeDSecureRequest.email = email
+            }
+            threeDSecureRequest.versionRequested = .version2
+
+            if let billingAddress = dict(for: "billingAddress", in: call) {
+                let address = BTThreeDSecurePostalAddress()
+                address.givenName = billingAddress["givenName"] as? String
+                address.surname = billingAddress["surname"] as? String
+                address.phoneNumber = billingAddress["phoneNumber"] as? String
+                address.streetAddress = billingAddress["streetAddress"] as? String
+                address.extendedAddress = billingAddress["extendedAddress"] as? String
+                address.locality = billingAddress["locality"] as? String
+                address.region = billingAddress["region"] as? String
+                address.postalCode = billingAddress["postalCode"] as? String
+                address.countryCodeAlpha2 = billingAddress["countryCodeAlpha2"] as? String
+                threeDSecureRequest.billingAddress = address
+
+                // Optional additional information.
+                // For best results, provide as many of these elements as possible.
+                let info = BTThreeDSecureAdditionalInformation()
+                info.shippingAddress = address
+                threeDSecureRequest.additionalInformation = info
+            }
+
+            let dropInRequest = BTDropInRequest()
+
+            if let amount = string(for: "amount", in: call) {
+                threeDSecureRequest.threeDSecureRequestDelegate = self
+                threeDSecureRequest.amount = NSDecimalNumber(string: amount)
+                dropInRequest.threeDSecureRequest = threeDSecureRequest
+            }
+
+            var deviceData: String?
+            if let collectDeviceData = bool(for: "collectDeviceData", in: call),
+                collectDeviceData
+            {
+                deviceData = PPDataCollector.collectPayPalDeviceData()
+            }
+
+            if let vaultManagerEnabled = bool(for: "vaultManagerEnabled", in: call) {
+                dropInRequest.vaultManager = vaultManagerEnabled
+            }
+
+            if let cardEnabled = bool(for: "cardEnabled", in: call) {
+                dropInRequest.cardDisabled = !cardEnabled
+            }
+
+            if let paypalEnabled = bool(for: "paypalEnabled", in: call) {
+                dropInRequest.paypalDisabled = !paypalEnabled
+            }
+
+            // if let paypalInfo = dict(for: "paypalRequest", in: call) {
+            //     // if let amount = paypalInfo["amount"] as? String {
+            //     //     let paypalRequest = BTPayPalCheckoutRequest(amount: amount)
+            //     //     paypalRequest.currencyCode = paypalInfo["currencyCode"] as? String
+            //     //     paypalRequest.displayName = paypalInfo["displayName"] as? String
+            //     //     paypalRequest.billingAgreementDescription = paypalInfo["billingAgreementDescription"] as? String
+            //     //     dropInRequest.payPalRequest = paypalRequest
+            //     // } else {
+            //         let paypalRequest = BTPayPalVaultRequest()
+            //         paypalRequest.displayName = paypalInfo["displayName"] as? String
+            //         paypalRequest.billingAgreementDescription = paypalInfo["billingAgreementDescription"] as? String
+            //         dropInRequest.payPalRequest = paypalRequest
+            //     // }
+            // } else {
+            //     dropInRequest.paypalDisabled = true
+            // }
+
+            if let applePayInfo = dict(for: "applePayRequest", in: call) {
+                self.applePayInfo = applePayInfo
+            } else {
+                dropInRequest.applePayDisabled = true
+            }
+
+            guard let authorization = getAuthorization(call: call) else {
+                returnAuthorizationMissingError(result: result)
+                isHandlingResult = false
+                return
+            }
+
+            self.authorization = authorization
+
+            let dropInController = BTDropInController(
+                authorization: authorization, request: dropInRequest
+            ) { (controller, braintreeResult, error) in
+                controller.dismiss(animated: true) {
+                    self.clearOverlayWindowIfNeeded(for: braintreeResult)
+                }
+                self.handleResult(
+                    result: braintreeResult, error: error, flutterResult: result,
+                    deviceData: deviceData)
+                self.isHandlingResult = false
+            }
+
+            guard let existingDropInController = dropInController else {
+                result(
+                    FlutterError(
+                        code: "braintree_error",
+                        message:
+                            "BTDropInController not initialized (no API key or request specified?)",
+                        details: nil))
+                isHandlingResult = false
+                return
+            }
+
+            newWindow.makeKeyAndVisible()
+
+            blockerVC.present(existingDropInController, animated: true, completion: nil)
+
+            overlayWindow = newWindow
+
+        case "setLanguage":
+            guard
+                let args = call.arguments as? [String: Any],
+                let language = args["language"] as? String
+            else {
+                result(
+                    FlutterError(
+                        code: "invalid_args",
+                        message: "Missing or invalid 'language' parameter",
+                        details: nil))
+                return
+            }
+            print("Setting language to: \(language)")
+            UserDefaults.standard.set([language], forKey: "AppleLanguages")
+            UserDefaults.standard.synchronize()
+            result(nil)
+
+        default:
+            result(FlutterMethodNotImplemented)
         }
-
-        guard let existingDropInController = dropInController else {
-            result(
-                FlutterError(
-                    code: "braintree_error",
-                    message:
-                        "BTDropInController not initialized (no API key or request specified?)",
-                    details: nil))
-            isHandlingResult = false
-            return
-        }
-
-        newWindow.makeKeyAndVisible()
-
-        blockerVC.present(existingDropInController, animated: true, completion: nil)
-
-        overlayWindow = newWindow
     }
 
     private func setupApplePay(flutterResult: FlutterResult) {
