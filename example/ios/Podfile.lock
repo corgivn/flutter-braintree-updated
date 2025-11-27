@@ -51,7 +51,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Braintree: 9e88d36e660d95a89f920cec2351392d647c3fe5
   BraintreeDropIn: dda213a718343fe1eaff1d593547c2feecf0ce3c
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_braintree: de1435565dee5dd644f8fab932dfd01acac50c90
 
 PODFILE CHECKSUM: cc1f88378b4bfcf93a6ce00d2c587857c6008d3b

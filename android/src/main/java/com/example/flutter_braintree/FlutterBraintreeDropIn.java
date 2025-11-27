@@ -11,6 +11,8 @@ import io.flutter.plugin.common.PluginRegistry.ActivityResultListener;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 
 import androidx.annotation.Nullable;
 
@@ -27,6 +29,7 @@ import com.google.android.gms.wallet.WalletConstants;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class FlutterBraintreeDropIn implements FlutterPlugin, ActivityAware, MethodCallHandler, ActivityResultListener, Serializable {
   private static final int DROP_IN_REQUEST_CODE = 0x1337;
@@ -132,6 +135,38 @@ public class FlutterBraintreeDropIn implements FlutterPlugin, ActivityAware, Met
       intent.putExtra("token", token);
       intent.putExtra("dropInRequest", dropInRequest);
       this.activity.startActivityForResult(intent, DROP_IN_REQUEST_CODE);
+    } else if (call.method.equals("setLanguage")) {
+      String language = call.argument("language");
+      language = language.trim().replace('_', '-');
+      if (language == null || language.isEmpty()) {
+        result.error("invalid_args", "Missing or invalid 'language' parameter", null);
+        return;
+      }
+      if (activity == null) {
+        result.error("no_activity", "Activity is null, cannot change language", null);
+        return;
+      }
+
+      Locale locale;
+      switch (language) {
+        case "zh-Hant":
+          locale = Locale.TRADITIONAL_CHINESE;
+          break;
+        case "zh-Hans":
+          locale = Locale.SIMPLIFIED_CHINESE;
+          break;
+        default:
+          locale = new Locale(language);
+          break;
+      }
+
+      Locale.setDefault(locale);
+      Resources res = activity.getResources();
+      Configuration config = res.getConfiguration();
+      config.setLocale(locale);
+      res.updateConfiguration(config, res.getDisplayMetrics());
+
+      result.success(null);
     } else {
       result.notImplemented();
     }
